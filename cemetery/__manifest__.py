@@ -1,0 +1,35 @@
+# Copyright (C) 2025 Open Source Integrators
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+{
+    "name": "Cemetery Management",
+    "version": "17.0.1.0.0",
+    "author": "Open Source Integrators",
+    "summary": "Cemetery Management",
+    "license": "AGPL-3",
+    "website": "http://www.opensourceintegrators.com",
+    "maintainers": "Open Source Integrators",
+    "depends": [
+        "contacts",
+        "stock",
+        "partner_multi_relation",
+        "stock_location_position",
+    ],
+    "data": [
+        "security/res_groups.xml",
+        "security/ir_rule.xml",
+        "security/ir.model.access.csv",
+        "data/product_template_data.xml",
+        "views/cemetery_location_views.xml",
+        "views/cemetery_views.xml",
+        "views/cemetery_beneficiary_views.xml",
+        "views/res_partner_views.xml",
+        "views/stock_lot_views.xml",
+        "views/product_template_views.xml",
+        "views/res_config_settings_views.xml",
+        "views/move_history_report.xml",
+        "wizard/cemetery_convert_views.xml",
+        "views/menus.xml",
+    ],
+    "installable": True,
+    "Application": True,
+}

@@ -1,0 +1,97 @@
+<odoo>
+    <!-- Stock Warehous -->
+    <record id="stock_group_stock_user_cemetery_warehouse_rule" model="ir.rule">
+        <field name="name">Stock User: Restrict Cemetery Warehouse</field>
+        <field name="model_id" ref="stock.model_stock_warehouse"/>
+        <field name="groups" eval="[(4, ref('stock.group_stock_user'))]"/>
+        <field name="domain_force">[('is_cemetery', '=', False)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="stock_group_cemetery_user_cemetery_warehouse_rule" model="ir.rule">
+        <field name="name">Cemetery User: Able to see Cemetery Warehouse</field>
+        <field name="model_id" ref="stock.model_stock_warehouse"/>
+        <field name="groups" eval="[(4, ref('cemetery.group_cemetery_user'))]"/>
+        <field name="domain_force">[('is_cemetery', '!=', False)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Stock Location -->
+    <record id="stock_group_user_location_rule" model="ir.rule">
+        <field name="name">Stock User: Restrict Cemetery Locations</field>
+        <field name="model_id" ref="stock.model_stock_location"/>
+        <field name="groups" eval="[(4, ref('stock.group_stock_user'))]"/>
+        <field name="domain_force">[('is_cemetery_location', '=', False)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="stock_group_cemetery_user_location" model="ir.rule">
+        <field name="name">Cemetery User: Able tp see Cemetery Location</field>
+        <field name="model_id" ref="stock.model_stock_location"/>
+        <field name="groups" eval="[(4, ref('cemetery.group_cemetery_user'))]"/>
+        <field name="domain_force">[('is_cemetery_location', '!=', False)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Stock Lot -->
+
+    <record id="stock_group_user_stock_lot_rule" model="ir.rule">
+        <field name="name">Stock User: Restrict Stock Lot</field>
+        <field name="model_id" ref="stock.model_stock_lot"/>
+        <field name="groups" eval="[(4, ref('stock.group_stock_user'))]"/>
+        <field name="domain_force">[('is_cemetery_beneficiary', '=', False)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="stock_group_cemetery_stock_lot_rule" model="ir.rule">
+        <field name="name">Cemetery User: Not Restrict Stock Lot</field>
+        <field name="model_id" ref="stock.model_stock_lot"/>
+        <field name="groups" eval="[(4, ref('cemetery.group_cemetery_user'))]"/>
+        <field name="domain_force">[('is_cemetery_beneficiary', '=', True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Product Template -->
+    
+    <record id="stock_group_user_product_template_rule" model="ir.rule">
+        <field name="name">Stock User: Restrict Cemetery Product</field>
+        <field name="model_id" ref="stock.model_product_template"/>
+        <field name="groups" eval="[(4, ref('stock.group_stock_user'))]"/>
+        <field name="domain_force">[('is_cemetery_beneficiary', '=', False)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="stock_group_cemetery_product_template_rule" model="ir.rule">
+        <field name="name">Cemetery User: Not Restrict Cemetery Product</field>
+        <field name="model_id" ref="stock.model_product_template"/>
+        <field name="groups" eval="[(4, ref('cemetery.group_cemetery_user'))]"/>
+        <field name="domain_force">[('is_cemetery_beneficiary', '=', True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+
+</odoo>

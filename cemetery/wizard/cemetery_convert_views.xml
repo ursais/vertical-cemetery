@@ -1,0 +1,42 @@
+<odoo>
+    <!-- Res Partner Action -->
+    <record id="partner_cemetery_action" model="ir.actions.act_window">
+        <field name="name">Convert to Cemetery Record</field>
+        <field name="res_model">cemetery.convert</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="base.model_res_partner" />
+        <field
+            name="groups_id"
+            eval="[(4, ref('cemetery.group_cemetery_user'))]"
+        />
+        <field name="binding_view_types">form,list</field>
+    </record>
+    <!-- wizard view -->
+    <record id="cemetery_partner_wizard_view" model="ir.ui.view">
+        <field name="name">Convert to a Cemetery</field>
+        <field name="model">cemetery.convert</field>
+        <field name="arch" type="xml">
+            <form string="Convert to a Cemetery or Cemetery Location or Beneficiary">
+                <div>
+                    Select whether you want to convert this record to a Cemetery or Cemetery Location or Beneficiary.
+                </div>
+                <group>
+                    <group>
+                        <field name="cemetery_type" widget="selection"  required="1"/>
+                        <field name="cemetery_id" invisible="cemetery_type not in ['concession','columbarium','common_ground','ossuary']"/>
+                    </group>
+                </group>
+                <footer>
+                    <button
+                        string="Convert"
+                        name="action_convert"
+                        type="object"
+                        class="btn-primary"
+                    />
+                    <button string="Cancel" class="btn-default" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

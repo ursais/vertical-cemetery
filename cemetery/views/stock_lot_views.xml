@@ -1,0 +1,14 @@
+<odoo>
+    <record id="view_production_lot_form_inherit_cemetery" model="ir.ui.view">
+        <field name="name">stock.production.lot.form</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <field name="location_id" position="after">
+                <field name="is_cemetery_beneficiary" groups="cemetery.group_cemetery_user"/>
+                <field name="beneficiary_id" groups="cemetery.group_cemetery_user" invisible="not is_cemetery_beneficiary"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

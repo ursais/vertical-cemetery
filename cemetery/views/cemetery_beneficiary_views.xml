@@ -1,0 +1,45 @@
+<odoo>
+    <record id="cemetery_beneficiary_form_view" model="ir.ui.view">
+       <field name="name">cemetery.beneficiary.form</field>
+       <field name="model">cemetery.beneficiary</field>
+       <field name="arch" type="xml">
+           <form string="Beneficiary">
+            <sheet>
+                <group>
+                    <group>
+                        <field name="partner_id" widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True , 'is_cemetery_partner':1}"/>
+                        <field name="serial_id" context="{'is_cemetery_lot':1}"/>
+                        <field name="beneficiary_type"/>
+                        <field name="death_date"/>
+                        <field name="last_movement_date"/>
+                        <field name="cemetery_location_id"/>
+                        <field name="dest_cemetery_location_id"/>
+                    </group>
+                </group>
+            </sheet>
+           </form>
+       </field>
+    </record>
+
+    <record id="cemetery_beneficiary_tree_view" model="ir.ui.view">
+       <field name="name">cemetery.beneficiary.tree</field>
+       <field name="model">cemetery.beneficiary</field>
+       <field name="arch" type="xml">
+           <tree string="Beneficiary">
+               <field name="partner_id"/>
+                <field name="serial_id"/>
+                <field name="beneficiary_type"/>
+                <field name="death_date"/>
+                <field name="last_movement_date"/>
+                <field name="cemetery_location_id"/>
+           </tree>
+       </field>
+    </record>
+
+    <record id="cemetery_beneficiary_action" model="ir.actions.act_window">
+        <field name="name">Beneficiaries</field>
+        <field name="res_model">cemetery.beneficiary</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="cemetery_beneficiary_tree_view"/>
+    </record>
+</odoo>

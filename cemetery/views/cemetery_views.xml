@@ -1,0 +1,34 @@
+<odoo>
+
+    <record id="cemetery_warehouse_form_view" model="ir.ui.view">
+        <field name="name">stock.warehouse</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <field name="code" position="after">
+                <field name="is_cemetery"/> 
+            </field>
+        </field>
+    </record>
+ 
+    <record id="cemetery_action" model="ir.actions.act_window">
+        <field name="name">Cemeteries</field>
+        <field name="res_model">cemetery</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_is_cemetery':True}</field>
+    </record>
+
+    <record id="cemetery_view_tree_act" model="ir.actions.act_window.view">
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="stock.view_warehouse_tree"/>
+        <field name="act_window_id" ref="cemetery.cemetery_action"/>
+    </record>
+
+    <record id="cemetery_view_form_act" model="ir.actions.act_window.view">
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="cemetery.cemetery_warehouse_form_view"/>
+        <field name="act_window_id" ref="cemetery.cemetery_action"/>
+    </record>
+
+</odoo>

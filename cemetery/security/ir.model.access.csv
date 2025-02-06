@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+cemetery.access_cemetery.user,access_cemetery,cemetery.model_cemetery,cemetery.group_cemetery_user,1,0,0,0
+cemetery.access_cemetery.manager,access_cemetery,cemetery.model_cemetery,cemetery.group_cemetery_manager,1,1,1,1
+access_cemetery_location,cemetery_location user,cemetery.model_cemetery_location,cemetery.group_cemetery_user,1,0,0,0
+access_cemetery_location_manager,cemetery_location manager,cemetery.model_cemetery_location,cemetery.group_cemetery_manager,1,1,1,1
+access_cemetery_beneficiary,cemetery_beneficiary user,cemetery.model_cemetery_beneficiary,cemetery.group_cemetery_user,1,1,1,0
+access_cemetery_beneficiary_manager,cemetery_beneficiary manager,cemetery.model_cemetery_beneficiary,cemetery.group_cemetery_manager,1,1,1,1
+cemetery.access_cemetery_convert,access_cemetery_convert,cemetery.model_cemetery_convert,cemetery.group_cemetery_user,1,1,1,0
+
