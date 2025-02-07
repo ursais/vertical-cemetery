@@ -93,7 +93,6 @@
                                     <field name="death_date"/>
                                     <field name="last_movement_date"/>
                                     <field name="cemetery_location_id" readonly="1"/>
-                                    <field name="dest_cemetery_location_id" readonly="1"/>
                                 </tree>
                             </field>
                         </page>

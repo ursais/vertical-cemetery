@@ -22,12 +22,17 @@ class CemeteryBeneficiary(models.Model):
         "cemetery.location", string="Destination Location"
     )
 
-    @api.model_create_multi
+    @api.model
     def create(self, vals_list):
         beneficiary = super().create(vals_list)
         StockMove = self.env["stock.move"]
+        StockQuant = self.env["stock.quant"]
         stock_move_list = []
-        # inventory  beneficiary
+        cemetery_product = (
+            self.env.company.cemetery_product_template
+            and self.env.company.cemetery_product_template.product_variant_id
+            or self.env["product.product"]
+        )
         inventory_loss = self.env["stock.location"].search(
             [
                 ("usage", "=", "inventory"),
@@ -36,64 +41,39 @@ class CemeteryBeneficiary(models.Model):
             ],
             limit=1,
         )
-        StockPickingType = self.env["stock.picking.type"]
-        for data in beneficiary:
-            picking_id = StockPickingType.search(
-                [
+        beneficiary.serial_id.beneficiary_id = beneficiary.id
+        stock_move_list.append(
+            {
+                "company_id": self.env.company.id,
+                "product_id": cemetery_product.id,
+                "product_uom": cemetery_product.uom_id.id,
+                "location_id": inventory_loss.id,
+                "location_dest_id": beneficiary.cemetery_location_id.location_cemetery_id.id,
+                "name": beneficiary.beneficiary_type,
+                "procure_method": "make_to_stock",
+                "product_uom_qty": 1,
+                "date": beneficiary.death_date,
+                "is_inventory": True,
+                "picked": True,
+                "state": "confirmed",
+                "move_line_ids": [
                     (
-                        "warehouse_id",
-                        "=",
-                        data.cemetery_location_id.cemetery_id.warehouse_id.id,
-                    ),
-                    ("code", "=", "internal"),
-                ]
-            )
-            internal_picking = self.env["stock.picking"].create(
-                {
-                    "partner_id": data.partner_id.id,
-                    "picking_type_id": picking_id.id,
-                    "location_id": data.cemetery_location_id.location_cemetery_id.id,
-                    "location_dest_id": data.dest_cemetery_location_id.location_cemetery_id.id,
-                    "state": "draft",
-                }
-            )
-            stock_move_list.append(
-                {
-                    "company_id": self.env.company.id,
-                    "product_id": self.env.company.cemetery_product_template.product_variant_ids
-                    and self.env.company.cemetery_product_template.product_variant_ids.ids[
-                        0
-                    ],
-                    "product_uom": data.serial_id.product_id.uom_id.id,
-                    "picking_id": internal_picking.id,
-                    "location_id": internal_picking.location_id.id,
-                    "location_dest_id": internal_picking.location_dest_id.id,
-                    "name": data.beneficiary_type,
-                    "procure_method": "make_to_stock",
-                    "product_uom_qty": 1,
-                    "date": data.death_date,
-                    "state": "draft",
-                    "move_line_ids": [
-                        (
-                            0,
-                            0,
-                            {
-                                "location_id": internal_picking.location_id.id,
-                                "location_dest_id": internal_picking.location_dest_id.id,
-                                "product_id": self.env.company.cemetery_product_template.product_variant_ids
-                                and self.env.company.cemetery_product_template.product_variant_ids.ids[
-                                    0
-                                ],
-                                "product_uom_id": data.serial_id.product_id.uom_id.id,
-                                "company_id": self.env.company.id,
-                                "date": data.death_date,
-                                "lot_id": data.serial_id.id,
-                                "quantity": 1,
-                            },
-                        )
-                    ],
-                }
-            )
-            data.serial_id.beneficiary_id = data.id
-        StockMove.create(stock_move_list)
+                        0,
+                        0,
+                        {
+                            "location_id": inventory_loss.id,
+                            "location_dest_id": beneficiary.cemetery_location_id.location_cemetery_id.id,
+                            "product_id": cemetery_product.id,
+                            "product_uom_id": cemetery_product.uom_id.id,
+                            "company_id": self.env.company.id,
+                            "date": beneficiary.death_date,
+                            "lot_id": beneficiary.serial_id.id,
+                            "quantity": 1,
+                        },
+                    )
+                ],
+            }
+        )
+        stock_move = StockMove.create(stock_move_list)
+        stock_move._action_done()
         return beneficiary

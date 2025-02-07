@@ -15,8 +15,8 @@ class CemeteryLocation(models.Model):
     )
     partner_id = fields.Many2one("res.partner")
     beneficiary_ids = fields.One2many("cemetery.beneficiary", "cemetery_location_id")
-    available_space = fields.Integer(compute="_compute_available_space")
-    occupied_space = fields.Integer(compute="_compute_available_space")
+    available_space = fields.Integer(compute="_compute_available_occupied_space")
+    occupied_space = fields.Integer(compute="_compute_available_occupied_space")
 
     @api.model
     def _search(self, domain, offset=0, limit=None, order=None, access_rights_uid=None):
@@ -24,28 +24,25 @@ class CemeteryLocation(models.Model):
             domain += [("usage", "!=", "view")]
         return super()._search(domain, offset, limit, order, access_rights_uid)
 
-    def _compute_available_space(self):
+    def _compute_available_occupied_space(self):
         stock_quant_obj = self.env["stock.quant"]
-        for location in self:
-            storage_cap2 = location.location_cemetery_id
-            stock_quant = stock_quant_obj.search(
-                [
-                    ("location_id", "=", location.location_cemetery_id.id),
-                    ("lot_id", "!=", False),
-                ]
+        available_space = 0
+        occupied_space = 0
+        for cem_location in self:
+            location = cem_location.location_cemetery_id
+            cemetery_product = (
+                self.env.company.cemetery_product_template
+                and self.env.company.cemetery_product_template.product_variant_id
+                or self.env["product.product"]
             )
-            stock_count = sum(stock_quant.mapped("quantity"))
-            storage_cap = stock_quant.mapped(
-                "storage_category_id.product_capacity_ids"
-            ).filtered(lambda l: l.product_id.id in stock_quant.product_id.ids)
-            available_space = 0
-            occupied_space = 0
-            if stock_quant.location_id.location_id.usage == "view":
-                available_space = stock_count
-                occupied_space = storage_cap.quantity - stock_count
-            else:
-                available_space = storage_cap.quantity - stock_count
-                occupied_space = stock_count
-
-            location.available_space = available_space
-            location.occupied_space = occupied_space
+            storage_cap = location.storage_category_id.mapped(
+                "product_capacity_ids"
+            ).filtered(lambda l: l.product_id.id == cemetery_product.id)
+            available_space = storage_cap.quantity
+            occupied_space = sum(
+                stock_quant_obj.search([("location_id", "=", location.id)]).mapped(
+                    "quantity"
+                )
+            )
+            cem_location.available_space = available_space - occupied_space
+            cem_location.occupied_space = occupied_space
