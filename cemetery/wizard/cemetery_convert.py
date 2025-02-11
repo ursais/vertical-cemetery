@@ -32,6 +32,16 @@ class CemeteryConvert(models.TransientModel):
     def action_create_cemetery_location(self, partner):
         CemeteryLocation = self.env["cemetery.location"].with_context(active_test=False)
         existing_location = CemeteryLocation.search([("partner_id", "=", partner.id)])
+        location_id = self.env["stock.location"].search(
+            [
+                ("warehouse_id", "=", self.cemetery_id.warehouse_id.id),
+                ("usage", "=", "internal"),
+            ],
+            limit=1,
+        )
+        cemetery_location = self.env["cemetery.location"].search(
+            [("location_cemetery_id", "=", location_id.id)]
+        )
         if existing_location:
             raise UserError(_("A Cemetery Location exists."))
         location = CemeteryLocation.create(
@@ -40,6 +50,7 @@ class CemeteryConvert(models.TransientModel):
                 "partner_id": partner.id,
                 "is_cemetery_location": True,
                 "cemetery_id": self.cemetery_id.id,
+                "location_id": cemetery_location.id,
             }
         )
         partner.write({"is_cemetery_location": True})
@@ -47,6 +58,7 @@ class CemeteryConvert(models.TransientModel):
             {
                 "cemetery_location_type": self.cemetery_type,
                 "warehouse_id": self.cemetery_id.warehouse_id.id,
+                "location_id": location_id.id,
             }
         )
 

@@ -1,11 +1,10 @@
 <odoo>
-    <record id="cemetery_location_view_kanban" model="ir.ui.view">
-    <field name="name">cemetery.location.view.kanban</field>
-    <field name="model">cemetery.location</field>
+    <record id="cemetery_view_kanban" model="ir.ui.view">
+    <field name="name">cemetery.view.kanban</field>
+    <field name="model">cemetery</field>
     <field name="arch" type="xml">
         <kanban class="o_kanban_dashboard o_emphasize_colors" create="0" group_create="false">
-            <field name="cemetery_id"/>
-            <field name="parent_id"/>
+            <field name="name"/>
             <templates>
                 <t t-name="kanban-box">
                     <!-- Kanban Card Header -->
@@ -15,18 +14,12 @@
                                 <div class="o_primary">
                                     <field name="name"/>
                                 </div>
-                                <div class="o_secondary">
-                                    <!-- Warehouse Name -->
-                                    <field class="o_secondary" name="warehouse_id" readonly="1" groups="stock.group_stock_multi_warehouses"/>
-                                </div>
                                 <div class="row">
-                                    <!-- Available Space -->
                                     <div class="o_primary col-6 o_kanban_primary_left">
                                         <span>Available Space: </span><field name="available_space"/>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <!-- Available Space -->
                                     <div class="o_primary col-6 o_kanban_primary_left">
                                         <span>Occupied Space: </span><field name="occupied_space"/>
                                     </div>
@@ -43,15 +36,12 @@
     </record>
 
 
-
-
-
     <!--Add an action to open the Kanban view-->
     <record id="cemetery_location_dashboard_action" model="ir.actions.act_window">
-        <field name="name">Location Overview</field>
-        <field name="res_model">cemetery.location</field>
+        <field name="name">Cemeteries Overview</field>
+        <field name="res_model">cemetery</field>
         <field name="view_mode">kanban</field>
-        <field name="view_id" ref="cemetery_location_view_kanban"/>
+        <field name="view_id" ref="cemetery_view_kanban"/>
         <field name="context">{'is_cemetery_location_kanban':1}</field>
     </record>
 
@@ -61,7 +51,7 @@
         <field name="inherit_id" ref="stock.view_location_form"/>
         <field name="arch" type="xml">
             <field name="usage" position="before">
-                <field name="is_cemetery_location" groups="cemetery.group_cemetery_user"/>
+                <field name="is_cemetery_location" groups="cemetery.group_cemetery_user" invisible="1"/>
             </field>
         </field>
     </record>
@@ -72,32 +62,46 @@
         <field name="inherit_id" ref="stock.view_location_form"/>
         <field name="mode">primary</field>
         <field name="arch" type="xml">
-            <xpath expr="//group[1]//group[3]" position="after">
-                <group name="cemetery" string="Cemetery">
-                    <field name="is_cemetery_location"/>
-                    <field name="cemetery_location_type"/>
-                    <field name="cemetery_id"/>
-                    <field name="parent_id"/>
-                    <field name="partner_id" context="{'is_cemetery_location':True}"/>
-                </group>
-            </xpath>
+            <field name="storage_category_id" position="after">
+                <field name="cemetery_location_type"/>
+                <field name="cemetery_id"/>
+                <field name="parent_id"/>
+                <field name="partner_id" context="{'is_cemetery_location':True}"/>
+            </field>
 
             <field name="comment" position="after">
-                 <notebook>
-                        <page string="Beneficiaries" name="beneficiaries">
-                            <field name="beneficiary_ids" mode="tree">
-                                <tree editable="bottom">
-                                    <field name="partner_id" required="1" context="{'is_cemetery_partner':1}"/>
-                                    <field name="serial_id"/>
-                                    <field name="beneficiary_type"/>
-                                    <field name="death_date"/>
-                                    <field name="last_movement_date"/>
-                                    <field name="cemetery_location_id" readonly="1"/>
-                                </tree>
-                            </field>
-                        </page>
-                    </notebook>
+                <notebook>
+                    <page string="Beneficiaries" name="beneficiaries">
+                        <field name="beneficiary_ids" mode="tree">
+                            <tree editable="bottom">
+                                <field name="beneficiary_type"/>
+                                <field name="death_date"/>
+                                <field name="cemetery_location_id" readonly="1"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
             </field>
+
+            <field name="scrap_location" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+
+            <field name="return_location" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+
+            <field name="replenish_location" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+
+            <field name="usage" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+
+            <xpath expr="//group[1]/group[3]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
 
         </field>
     </record>
