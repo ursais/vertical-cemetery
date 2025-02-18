@@ -10,7 +10,6 @@
     "maintainers": "Open Source Integrators",
     "depends": [
         "contacts",
-        "stock",
         "partner_multi_relation",
         "stock_location_position",
     ],
