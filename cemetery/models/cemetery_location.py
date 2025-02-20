@@ -15,3 +15,8 @@ class CemeteryLocation(models.Model):
     )
     partner_id = fields.Many2one("res.partner")
     beneficiary_ids = fields.One2many("cemetery.beneficiary", "cemetery_location_id")
+
+    @api.depends("cemetery_id")
+    def _compute_display_name(self):
+        for location in self:
+            location.display_name = location.cemetery_id.code + "/" + location.name

@@ -1,7 +1,8 @@
 # Copyright (C) 2025 Open Source Integrators
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import fields, models, api
+from odoo import fields, models, api, _
+from odoo.exceptions import ValidationError
 
 
 class CemeteryBeneficiary(models.Model):
@@ -37,6 +38,34 @@ class CemeteryBeneficiary(models.Model):
     cemetery_location_id = fields.Many2one(
         "cemetery.location", string="Current Location"
     )
+    complete_name = fields.Char()
+
+    @api.constrains("cemetery_location_id")
+    def _check_cemetery_location_id(self):
+        stock_quant_obj = self.env["stock.quant"]
+        occupied_space = 0
+        cemetery_product = (
+            self.env.company.cemetery_product_template
+            and self.env.company.cemetery_product_template.product_variant_id
+            or self.env["product.product"]
+        )
+        for rec in self:
+            location = rec.cemetery_location_id.location_cemetery_id
+            occupied_space += sum(
+                stock_quant_obj.search([("location_id", "=", location.id)]).mapped(
+                    "quantity"
+                )
+            )
+            storage_cap = location.storage_category_id.mapped(
+                "product_capacity_ids"
+            ).filtered(lambda l: l.product_id.id == cemetery_product.id)
+            available_space = storage_cap.quantity
+            if occupied_space >= available_space:
+                raise ValidationError(
+                    _(
+                        f"Please choose a different location, as this {rec.cemetery_location_id.display_name} one is fully occupied."
+                    )
+                )
 
     def _prepare_stock_move_vals(self, beneficiary):
         StockMove = self.env["stock.move"]
@@ -62,6 +91,9 @@ class CemeteryBeneficiary(models.Model):
         ):
             location_id = self._context.get("source_location")
             location_dest_id = self._context.get("desti_location_id")
+        beneficiary.complete_name = (
+            self.env["stock.location"].browse(location_dest_id).complete_name
+        )
         stock_move_list.append(
             {
                 "company_id": self.env.company.id,
@@ -108,19 +140,27 @@ class CemeteryBeneficiary(models.Model):
             and self.env.company.cemetery_product_template.product_variant_id
             or self.env["product.product"]
         )
-        partner_id = self.env["res.partner"].create(
-            {
-                "name": beneficiary.name,
-                "street": beneficiary.street,
-                "street2": beneficiary.street2,
-                "city": beneficiary.city,
-                "state_id": beneficiary.state_id.id,
-                "zip": beneficiary.zip,
-                "country_id": beneficiary.country_id.id,
-                "is_cemetery_beneficiary": True,
-                "cemetery_beneficiary_type": beneficiary.beneficiary_type,
-            }
+        partner_id = (
+            self._context.get("with_partner_id", False)
+            and self.env["res.partner"].browse(
+                self._context.get("with_partner_id", False)
+            )
+            or self.env["res.partner"]
         )
+        if not partner_id:
+            partner_id = self.env["res.partner"].create(
+                {
+                    "name": beneficiary.name,
+                    "street": beneficiary.street,
+                    "street2": beneficiary.street2,
+                    "city": beneficiary.city,
+                    "state_id": beneficiary.state_id.id,
+                    "zip": beneficiary.zip,
+                    "country_id": beneficiary.country_id.id,
+                    "is_cemetery_beneficiary": True,
+                    "cemetery_beneficiary_type": beneficiary.beneficiary_type,
+                }
+            )
         beneficiary.partner_id = partner_id.id
         beneficiary.partner_id.beneficiary_id = beneficiary.id
         serial_id = self.env["stock.lot"].create(

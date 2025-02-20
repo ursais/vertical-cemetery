@@ -14,7 +14,7 @@ class Cemetery(models.Model):
     available_space = fields.Integer(compute="_compute_available_occupied_space")
     occupied_space = fields.Integer(compute="_compute_available_occupied_space")
 
-    def _compute_available_occupied_space(self):
+    def _get_available_occupied_space(self):
         stock_quant_obj = self.env["stock.quant"]
         cemetery_product = (
             self.env.company.cemetery_product_template
@@ -22,23 +22,29 @@ class Cemetery(models.Model):
             or self.env["product.product"]
         )
         CemeteryLocation = self.env["cemetery.location"]
-        for cemetery in self:
-            available_space = 0
-            occupied_space = 0
-            cemetery_locations = CemeteryLocation.search(
-                [("cemetery_id", "=", cemetery.id), ("usage", "!=", "view")]
-            )
-            for cem_location in cemetery_locations:
-                location = cem_location.location_cemetery_id
-                storage_cap = location.storage_category_id.mapped(
-                    "product_capacity_ids"
-                ).filtered(lambda l: l.product_id.id == cemetery_product.id)
-                available_space += storage_cap.quantity
-                occupied_space += sum(
-                    stock_quant_obj.search([("location_id", "=", location.id)]).mapped(
-                        "quantity"
-                    )
+        available_space = 0
+        occupied_space = 0
+        cemetery_locations = CemeteryLocation.search(
+            [("cemetery_id", "=", self.id), ("usage", "!=", "view")]
+        )
+        for cem_location in cemetery_locations:
+            location = cem_location.location_cemetery_id
+            storage_cap = location.storage_category_id.mapped(
+                "product_capacity_ids"
+            ).filtered(lambda l: l.product_id.id == cemetery_product.id)
+            available_space += storage_cap.quantity
+            occupied_space += sum(
+                stock_quant_obj.search([("location_id", "=", location.id)]).mapped(
+                    "quantity"
                 )
+            )
+        available_space = available_space
+        occupied_space = occupied_space
+        return available_space, occupied_space
+
+    def _compute_available_occupied_space(self):
+        for cemetery in self:
+            available_space, occupied_space = cemetery._get_available_occupied_space()
             cemetery.available_space = available_space - occupied_space
             cemetery.occupied_space = occupied_space
 

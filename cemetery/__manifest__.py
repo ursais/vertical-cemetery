@@ -8,11 +8,7 @@
     "license": "AGPL-3",
     "website": "http://www.opensourceintegrators.com",
     "maintainers": "Open Source Integrators",
-    "depends": [
-        "contacts",
-        "partner_multi_relation",
-        "stock_location_position",
-    ],
+    "depends": ["contacts", "partner_multi_relation", "stock_location_position",],
     "data": [
         "security/res_groups.xml",
         "security/ir_rule.xml",

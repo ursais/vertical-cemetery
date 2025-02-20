@@ -74,6 +74,7 @@
                     <page string="Beneficiaries" name="beneficiaries">
                         <field name="beneficiary_ids" mode="tree">
                             <tree editable="bottom">
+                                <field name="name" string="Beneficiary"/>
                                 <field name="beneficiary_type"/>
                                 <field name="death_date"/>
                                 <field name="cemetery_location_id" readonly="1"/>

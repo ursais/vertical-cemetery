@@ -24,7 +24,8 @@
                 <group>
                     <group>
                         <field name="cemetery_type" widget="selection"  required="1"/>
-                        <field name="cemetery_id" invisible="cemetery_type not in ['concession','columbarium','common_ground','ossuary']"/>
+                        <field name="cemetery_id" invisible="cemetery_type in ['cemetery'] or not cemetery_type"/>
+                        <field name="cemetery_location_id" domain = "[('cemetery_id','=',cemetery_id),('usage', '!=', 'view')]" invisible= "not cemetery_type or cemetery_type not in ['deceased','rights_holder']" />
                     </group>
                 </group>
                 <footer>

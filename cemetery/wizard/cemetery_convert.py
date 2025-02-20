@@ -22,6 +22,9 @@ class CemeteryConvert(models.TransientModel):
         string="Cemetery type",
     )
     cemetery_id = fields.Many2one("cemetery")
+    cemetery_location_id = fields.Many2one(
+        "cemetery.location", string="Current Location"
+    )
 
     def action_create_cemetery_warehouse(self, partner):
         CemeteryWarehouse = self.env["cemetery"].with_context(active_test=False)
@@ -63,15 +66,41 @@ class CemeteryConvert(models.TransientModel):
         )
 
     def action_create_cemetery_beneficiary(self, partner):
-        if (
-            partner.is_cemetery_beneficiary
-            and partner.cemetery_beneficiary_type == self.cemetery_type
-        ):
-            raise UserError(_("A Cemetery Beneficiary partner already exists."))
+        CemeteryBeneficiary = self.env["cemetery.beneficiary"].with_context(
+            active_test=False, with_partner_id=partner.id
+        )
+        location_id = self.env["stock.location"].search(
+            [
+                ("warehouse_id", "=", self.cemetery_id.warehouse_id.id),
+                ("usage", "=", "internal"),
+            ],
+            limit=1,
+        )
+        cemetery_location = self.env["cemetery.location"].search(
+            [("location_cemetery_id", "=", location_id.id)]
+        )
+
+        cemetery_beneficiary = CemeteryBeneficiary.create(
+            {
+                "name": partner.name,
+                "street": partner.street,
+                "street2": partner.street2,
+                "city": partner.city,
+                "state_id": partner.state_id.id,
+                "zip": partner.zip,
+                "country_id": partner.country_id.id,
+                "partner_id": partner.id,
+                "serial_number": partner.id,
+                "beneficiary_type": self.cemetery_type,
+                "death_date": fields.Datetime.today(),
+                "cemetery_location_id": self.cemetery_location_id.id,
+            }
+        )
         partner.write(
             {
                 "is_cemetery_beneficiary": True,
                 "cemetery_beneficiary_type": self.cemetery_type,
+                "cemetery_id": self.cemetery_id.id,
             }
         )
 

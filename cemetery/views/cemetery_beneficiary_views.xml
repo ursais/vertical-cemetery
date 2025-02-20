@@ -30,7 +30,7 @@
                         <field name="serial_number"/>
                         <field name="beneficiary_type"/>
                         <field name="death_date"/>
-                        <field name="cemetery_location_id"/>
+                        <field name="cemetery_location_id" domain = "[('usage', '!=', 'view')]" context="{'is_cemetery_location':True}"/>
                     </group>
                 </group>
             </sheet>
@@ -43,9 +43,10 @@
        <field name="model">cemetery.beneficiary</field>
        <field name="arch" type="xml">
            <tree string="Beneficiary">
+                <field name="partner_id" string="Beneficiary"/>
                 <field name="beneficiary_type"/>
                 <field name="death_date"/>
-                <field name="cemetery_location_id"/>
+                <field name="complete_name" string="Current Location"/>
            </tree>
        </field>
     </record>
