@@ -14,9 +14,9 @@ class CemeteryLocation(models.Model):
         "stock.location", required=True, ondelete="cascade", delegate=True
     )
     partner_id = fields.Many2one("res.partner")
-    beneficiary_ids = fields.One2many("cemetery.beneficiary", "cemetery_location_id")
+    beneficiary_ids = fields.One2many("cemetery.beneficiary", "cemetery_location_id", readonly=True)
 
     @api.depends("cemetery_id")
     def _compute_display_name(self):
         for location in self:
-            location.display_name = location.cemetery_id.code + "/" + location.name
+            location.display_name = str(location.cemetery_id.code) + "/" + str(location.name)
