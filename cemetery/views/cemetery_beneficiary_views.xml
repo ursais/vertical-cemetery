@@ -29,7 +29,8 @@
                     <group>
                         <field name="serial_number"/>
                         <field name="beneficiary_type"/>
-                        <field name="death_date"/>
+                        <field name="occupation_date" />
+                        <field name="death_date" invisible="beneficiary_type != 'deceased'"/>
                         <field name="cemetery_location_id" domain = "[('usage', '!=', 'view')]" context="{'is_cemetery_location':True}"/>
                     </group>
                 </group>
