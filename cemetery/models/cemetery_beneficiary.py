@@ -1,8 +1,6 @@
 # Copyright (C) 2025 Open Source Integrators
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import datetime
-
 from odoo import fields, models, api, _
 from odoo.exceptions import ValidationError
 
@@ -185,9 +183,17 @@ class CemeteryBeneficiary(models.Model):
         return beneficiary
 
     def write(self, vals):
+        old_cemetery_location_id = self.cemetery_location_id.location_cemetery_id
+        inventory_loss = self.env["stock.location"].search(
+            [
+                ("usage", "=", "inventory"),
+                ("company_id", "=", self.env.company.id),
+                ("active", "=", True),
+            ],
+            limit=1,
+        )
         result = super().write(vals)
         if self.cemetery_location_id:
-            old_cemetery_location_id = self.cemetery_location_id.location_cemetery_id
             StockMove = self.env["stock.move"]
             if (
                 "cemetery_location_id" in vals
@@ -200,7 +206,7 @@ class CemeteryBeneficiary(models.Model):
                     {
                         "partner_id": self.partner_id.id,
                         "picking_type_id": self.cemetery_location_id.location_cemetery_id.warehouse_id.int_type_id.id,
-                        "location_id": old_cemetery_location_id.id,
+                        "location_id": old_cemetery_location_id.id or inventory_loss.id,
                         "location_dest_id": new_location.location_cemetery_id.id,
                     }
                 )
