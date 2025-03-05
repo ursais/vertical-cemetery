@@ -33,8 +33,10 @@ class CemeteryBeneficiary(models.Model):
     beneficiary_type = fields.Selection(
         selection=[("deceased", "Deceased"), ("rights_holder", "Rightsholder")],
         string="Beneficiary type",
+        required=True,
     )
     death_date = fields.Datetime(string="Death Date")
+    occupation_date = fields.Datetime(string="Occupation Date")
     cemetery_location_id = fields.Many2one(
         "cemetery.location", string="Current Location"
     )
@@ -50,22 +52,23 @@ class CemeteryBeneficiary(models.Model):
             or self.env["product.product"]
         )
         for rec in self:
-            location = rec.cemetery_location_id.location_cemetery_id
-            occupied_space += sum(
-                stock_quant_obj.search([("location_id", "=", location.id)]).mapped(
-                    "quantity"
-                )
-            )
-            storage_cap = location.storage_category_id.mapped(
-                "product_capacity_ids"
-            ).filtered(lambda l: l.product_id.id == cemetery_product.id)
-            available_space = storage_cap.quantity
-            if occupied_space >= available_space:
-                raise ValidationError(
-                    _(
-                        f"Please choose a different location, as this {rec.cemetery_location_id.display_name} one is fully occupied."
+            if rec.cemetery_location_id:
+                location = rec.cemetery_location_id.location_cemetery_id
+                occupied_space += sum(
+                    stock_quant_obj.search([("location_id", "=", location.id)]).mapped(
+                        "quantity"
                     )
                 )
+                storage_cap = location.storage_category_id.mapped(
+                    "product_capacity_ids"
+                ).filtered(lambda l: l.product_id.id == cemetery_product.id)
+                available_space = storage_cap.quantity
+                if occupied_space >= available_space:
+                    raise ValidationError(
+                        _(
+                            f"Please choose a different location, as this {rec.cemetery_location_id.display_name} one is fully occupied."
+                        )
+                    )
 
     def _prepare_stock_move_vals(self, beneficiary):
         StockMove = self.env["stock.move"]
@@ -104,7 +107,7 @@ class CemeteryBeneficiary(models.Model):
                 "name": beneficiary.beneficiary_type,
                 "procure_method": "make_to_stock",
                 "product_uom_qty": 1,
-                "date": beneficiary.death_date,
+                "date": beneficiary.occupation_date,
                 "is_inventory": True,
                 "picked": True,
                 "state": "confirmed",
@@ -120,7 +123,7 @@ class CemeteryBeneficiary(models.Model):
                             "product_id": cemetery_product.id,
                             "product_uom_id": cemetery_product.uom_id.id,
                             "company_id": self.env.company.id,
-                            "date": beneficiary.death_date,
+                            "date": beneficiary.occupation_date,
                             "lot_id": beneficiary.serial_id.id,
                             "quantity": 1,
                         },
@@ -133,8 +136,6 @@ class CemeteryBeneficiary(models.Model):
     @api.model
     def create(self, vals_list):
         beneficiary = super().create(vals_list)
-        StockMove = self.env["stock.move"]
-        stock_move_list = []
         cemetery_product = (
             self.env.company.cemetery_product_template
             and self.env.company.cemetery_product_template.product_variant_id
@@ -163,6 +164,7 @@ class CemeteryBeneficiary(models.Model):
             )
         beneficiary.partner_id = partner_id.id
         beneficiary.partner_id.beneficiary_id = beneficiary.id
+        beneficiary.serial_number = beneficiary.name
         serial_id = self.env["stock.lot"].create(
             {
                 "name": beneficiary.serial_number,
@@ -172,37 +174,49 @@ class CemeteryBeneficiary(models.Model):
         )
         beneficiary.serial_id = serial_id.id
         beneficiary.serial_id.beneficiary_id = beneficiary.id
-        stock_move_list = self._prepare_stock_move_vals(beneficiary)
-        stock_move = StockMove.create(stock_move_list)
-        stock_move._action_done()
+        if beneficiary.cemetery_location_id:
+            StockMove = self.env["stock.move"]
+            stock_move_list = []
+            stock_move_list = self._prepare_stock_move_vals(beneficiary)
+            stock_move = StockMove.create(stock_move_list)
+            stock_move._action_done()
         return beneficiary
 
     def write(self, vals):
         old_cemetery_location_id = self.cemetery_location_id.location_cemetery_id
+        inventory_loss = self.env["stock.location"].search(
+            [
+                ("usage", "=", "inventory"),
+                ("company_id", "=", self.env.company.id),
+                ("active", "=", True),
+            ],
+            limit=1,
+        )
         result = super().write(vals)
-        StockMove = self.env["stock.move"]
-        if (
-            "cemetery_location_id" in vals
-            and vals.get("cemetery_location_id", False) != old_cemetery_location_id.id
-        ):
-            new_location = self.env["cemetery.location"].search(
-                [("id", "=", vals.get("cemetery_location_id"))]
-            )
-            picking = self.env["stock.picking"].create(
-                {
-                    "partner_id": self.partner_id.id,
-                    "picking_type_id": self.cemetery_location_id.location_cemetery_id.warehouse_id.int_type_id.id,
-                    "location_id": old_cemetery_location_id.id,
-                    "location_dest_id": new_location.location_cemetery_id.id,
-                }
-            )
-            stock_move_list = self.with_context(
-                source_location=old_cemetery_location_id.id,
-                desti_location_id=new_location.location_cemetery_id.id,
-                picking_id=picking.id,
-            )._prepare_stock_move_vals(self)
-            stock_move = StockMove.create(stock_move_list)
-            picking.action_confirm()
-            picking.action_assign()
-            stock_move._action_done()
+        if self.cemetery_location_id:
+            StockMove = self.env["stock.move"]
+            if (
+                "cemetery_location_id" in vals
+                and vals.get("cemetery_location_id", False) != old_cemetery_location_id.id
+            ):
+                new_location = self.env["cemetery.location"].search(
+                    [("id", "=", vals.get("cemetery_location_id"))]
+                )
+                picking = self.env["stock.picking"].create(
+                    {
+                        "partner_id": self.partner_id.id,
+                        "picking_type_id": self.cemetery_location_id.location_cemetery_id.warehouse_id.int_type_id.id,
+                        "location_id": old_cemetery_location_id.id or inventory_loss.id,
+                        "location_dest_id": new_location.location_cemetery_id.id,
+                    }
+                )
+                stock_move_list = self.with_context(
+                    source_location=old_cemetery_location_id.id,
+                    desti_location_id=new_location.location_cemetery_id.id,
+                    picking_id=picking.id,
+                )._prepare_stock_move_vals(self)
+                stock_move = StockMove.create(stock_move_list)
+                picking.action_confirm()
+                picking.action_assign()
+                stock_move._action_done()
         return result
