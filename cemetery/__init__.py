@@ -3,3 +3,4 @@
 
 from . import models
 from . import wizard
+from .hooks import _activate_stock_settings

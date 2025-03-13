@@ -25,6 +25,7 @@
         "wizard/cemetery_convert_views.xml",
         "views/menus.xml",
     ],
+    'post_init_hook': '_activate_stock_settings',
     "installable": True,
     "Application": True,
 }
