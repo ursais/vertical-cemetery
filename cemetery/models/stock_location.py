@@ -4,7 +4,7 @@
 from odoo import fields, models
 
 
-class StockWarehous(models.Model):
+class StockLocation(models.Model):
     _inherit = "stock.location"
 
     cemetery_location_type = fields.Selection(

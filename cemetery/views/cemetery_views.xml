@@ -1,20 +1,41 @@
 <odoo>
 
-    <record id="cemetery_warehouse_form_view" model="ir.ui.view">
-        <field name="name">stock.warehouse</field>
+    <!--  Tree view  -->
+    <record id="view_warehouse_tree" model="ir.ui.view">
+        <field name="name">stock.warehouse.tree.inherit.cemetery</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="string">Cemetery</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!--  Form view  -->
+    <record id="view_warehouse" model="ir.ui.view">
+        <field name="name">stock.warehouse.inherit.cemetery</field>
         <field name="model">stock.warehouse</field>
         <field name="inherit_id" ref="stock.view_warehouse"/>
         <field name="mode">primary</field>
         <field name="arch" type="xml">
             <field name="code" position="after">
-                <field name="is_cemetery" invisible="1"/> 
+                <field name="is_cemetery" invisible="1"/>
             </field>
             <xpath expr="//button[@name='action_view_all_routes']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <xpath expr="//page[@name='warehouse_config']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='view_location_id']" position="attributes">
+                <attribute name="string">Cemetery view location</attribute>
+            </xpath>
         </field>
     </record>
- 
+
+    <!--  Actions  -->
     <record id="cemetery_action" model="ir.actions.act_window">
         <field name="name">Cemeteries</field>
         <field name="res_model">cemetery</field>
@@ -24,14 +45,15 @@
 
     <record id="cemetery_view_tree_act" model="ir.actions.act_window.view">
         <field name="view_mode">tree</field>
-        <field name="view_id" ref="stock.view_warehouse_tree"/>
+        <field name="view_id" ref="cemetery.view_warehouse_tree"/>
         <field name="act_window_id" ref="cemetery.cemetery_action"/>
     </record>
 
     <record id="cemetery_view_form_act" model="ir.actions.act_window.view">
         <field name="view_mode">form</field>
-        <field name="view_id" ref="cemetery.cemetery_warehouse_form_view"/>
+        <field name="view_id" ref="cemetery.view_warehouse"/>
         <field name="act_window_id" ref="cemetery.cemetery_action"/>
     </record>
+
 
 </odoo>

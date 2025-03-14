@@ -4,7 +4,7 @@
 from odoo import fields, models
 
 
-class StockWarehous(models.Model):
+class StockWarehouse(models.Model):
     _inherit = "stock.warehouse"
 
     is_cemetery = fields.Boolean("Cemetery?")

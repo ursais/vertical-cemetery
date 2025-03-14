@@ -7,7 +7,7 @@ from . import cemetery_beneficiary
 from . import product_template
 from . import stock_location
 from . import stock_lot
-from . import stock_warehous
+from . import stock_warehouse
 from . import cemetery_location
 from . import res_config
 from . import stock_move
