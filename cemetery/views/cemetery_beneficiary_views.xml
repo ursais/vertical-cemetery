@@ -1,61 +1,66 @@
 <odoo>
-    <record id="cemetery_beneficiary_form_view" model="ir.ui.view">
-       <field name="name">cemetery.beneficiary.form</field>
-       <field name="model">cemetery.beneficiary</field>
-       <field name="arch" type="xml">
-           <form string="Beneficiary">
-            <sheet>
-                <div class="oe_title mb24">
-                    <h1>
-                        <field id="beneficiary_name" options="{'line_breaks': False}" widget="text" class="text-break" name="name" default_focus="1" placeholder="e.g. Brandom Freeman" />
-                    </h1>
-                </div>
-                <group>
-                    <group>
-                        <span class="o_form_label o_td_label" name="address_name">
-                            <b>Address</b>
-                        </span>
-                        <div class="o_address_format">
-                            <field name="street" placeholder="Street..." class="o_address_street"/>
-                            <field name="street2" placeholder="Street 2..." class="o_address_street"/>
-                            <field name="city" placeholder="City" class="o_address_city"/>
-                            <field name="state_id" class="o_address_state" placeholder="State" options="{'no_open': True, 'no_quick_create': True}" context="{'country_id': country_id, 'default_country_id': country_id, 'zip': zip}"/>
-                            <field name="zip" placeholder="ZIP" class="o_address_zip"/>
-                            <div name="partner_address_country" class="d-flex justify-content-between">
-                                <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" />
+
+    <!--  Form  -->
+    <record id="cemetery_beneficiary_view_form" model="ir.ui.view">
+        <field name="name">cemetery.beneficiary.form</field>
+        <field name="model">cemetery.beneficiary</field>
+        <field name="arch" type="xml">
+            <form string="Beneficiary">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="action_open_partner" class="oe_stat_button" icon="fa-user">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Contact</span>
                             </div>
-                        </div>
-                    </group>
+                        </button>
+                    </div>
+                    <div class="oe_title mb24">
+                        <h1>
+                            <field
+                                id="beneficiary_name"
+                                options="{'line_breaks': False}"
+                                widget="text"
+                                class="text-break"
+                                name="name"
+                                default_focus="1"
+                                placeholder="e.g. Brandom Freeman"
+                            />
+                        </h1>
+                    </div>
                     <group>
-                        <field name="serial_number"/>
-                        <field name="beneficiary_type"/>
-                        <field name="occupation_date" />
-                        <field name="death_date" invisible="beneficiary_type != 'deceased'"/>
-                        <field name="cemetery_location_id" domain = "[('usage', '!=', 'view')]" context="{'is_cemetery_location':True}"/>
+                        <group>
+                            <field name="serial_number"/>
+                            <field name="beneficiary_type"/>
+                            <field name="occupation_date"/>
+                            <field
+                                name="cemetery_location_id"
+                                domain="[('usage', '!=', 'view'), ('is_cemetery_location', '=', True)]"
+                            />
+                        </group>
                     </group>
-                </group>
-            </sheet>
-           </form>
-       </field>
+                </sheet>
+            </form>
+        </field>
     </record>
 
-    <record id="cemetery_beneficiary_tree_view" model="ir.ui.view">
-       <field name="name">cemetery.beneficiary.tree</field>
-       <field name="model">cemetery.beneficiary</field>
-       <field name="arch" type="xml">
-           <tree string="Beneficiary">
-                <field name="partner_id" string="Beneficiary"/>
+    <!--  Tree  -->
+    <record id="cemetery_beneficiary_view_tree" model="ir.ui.view">
+        <field name="name">cemetery.beneficiary.view.tree</field>
+        <field name="model">cemetery.beneficiary</field>
+        <field name="arch" type="xml">
+            <tree string="Beneficiary" create="false">
+                <field name="name" string="Beneficiary"/>
                 <field name="beneficiary_type"/>
-                <field name="death_date"/>
                 <field name="complete_name" string="Current Location"/>
-           </tree>
-       </field>
+            </tree>
+        </field>
     </record>
 
+    <!--  Action  -->
     <record id="cemetery_beneficiary_action" model="ir.actions.act_window">
         <field name="name">Beneficiaries</field>
         <field name="res_model">cemetery.beneficiary</field>
         <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="cemetery_beneficiary_tree_view"/>
+        <field name="view_id" ref="cemetery_beneficiary_view_tree"/>
     </record>
 </odoo>

@@ -9,7 +9,6 @@ class StockReport(models.Model):
     _auto = False
 
     id = fields.Integer("", readonly=True)
-    death_date = fields.Datetime(string="Death Date", readonly=True)
     cemetery_location_id = fields.Many2one(
         "cemetery.location", string="Cemetery Location"
     )
@@ -31,10 +30,9 @@ class StockReport(models.Model):
         select_clause = """
             DISTINCT
             l.id AS id,
-            l.id AS location_id, 
+            l.id AS location_id,
             w.id AS warehouse_id,
             p.id AS partner_id,
-            cw.death_date as death_date,
             sl.id AS serial_id,
             cw.beneficiary_type AS cemetery_beneficiary_type,
             sq.quantity AS occupied_space,
@@ -54,7 +52,7 @@ class StockReport(models.Model):
         """
 
         # Define the GROUP BY part
-        group_by_clause = "l.id, l.name, w.name, p.name, cw.death_date, sl.name, cw.beneficiary_type, sq.quantity, sscc.quantity"
+        group_by_clause = "l.id, l.name, w.name, p.name, sl.name, cw.beneficiary_type, sq.quantity, sscc.quantity"
 
         # Create or replace the view
         self.env.cr.execute(
@@ -63,7 +61,7 @@ class StockReport(models.Model):
                                     %s
                                 FROM
                                     %s
-                                WHERE 
+                                WHERE
                                     l.is_cemetery_location = 't'
                                     AND w.is_cemetery = 't'
                                 GROUP BY

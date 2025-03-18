@@ -10,20 +10,6 @@ class CemeteryBeneficiary(models.Model):
     _description = "Cemetery Beneficiary"
 
     name = fields.Char()
-    # address fields
-    street = fields.Char()
-    street2 = fields.Char()
-    zip = fields.Char(change_default=True)
-    city = fields.Char()
-    state_id = fields.Many2one(
-        "res.country.state",
-        string="State",
-        ondelete="restrict",
-        domain="[('country_id', '=?', country_id)]",
-    )
-    country_id = fields.Many2one("res.country", string="Country", ondelete="restrict")
-    country_code = fields.Char(related="country_id.code", string="Country Code")
-    # BackendField-Used for Storing a Partner Value
     partner_id = fields.Many2one("res.partner", string="Name")
 
     serial_number = fields.Char(string="Serial Number")
@@ -35,7 +21,6 @@ class CemeteryBeneficiary(models.Model):
         string="Beneficiary type",
         required=True,
     )
-    death_date = fields.Datetime(string="Death Date")
     occupation_date = fields.Datetime(string="Occupation Date")
     cemetery_location_id = fields.Many2one(
         "cemetery.location", string="Current Location"
@@ -136,35 +121,15 @@ class CemeteryBeneficiary(models.Model):
     @api.model
     def create(self, vals_list):
         beneficiary = super().create(vals_list)
+
         cemetery_product = (
             self.env.company.cemetery_product_template
             and self.env.company.cemetery_product_template.product_variant_id
             or self.env["product.product"]
         )
-        partner_id = (
-            self._context.get("with_partner_id", False)
-            and self.env["res.partner"].browse(
-                self._context.get("with_partner_id", False)
-            )
-            or self.env["res.partner"]
-        )
-        if not partner_id:
-            partner_id = self.env["res.partner"].create(
-                {
-                    "name": beneficiary.name,
-                    "street": beneficiary.street,
-                    "street2": beneficiary.street2,
-                    "city": beneficiary.city,
-                    "state_id": beneficiary.state_id.id,
-                    "zip": beneficiary.zip,
-                    "country_id": beneficiary.country_id.id,
-                    "is_cemetery_beneficiary": True,
-                    "cemetery_beneficiary_type": beneficiary.beneficiary_type,
-                }
-            )
-        beneficiary.partner_id = partner_id.id
-        beneficiary.partner_id.beneficiary_id = beneficiary.id
+
         beneficiary.serial_number = beneficiary.name
+
         serial_id = self.env["stock.lot"].create(
             {
                 "name": beneficiary.serial_number,
@@ -174,12 +139,13 @@ class CemeteryBeneficiary(models.Model):
         )
         beneficiary.serial_id = serial_id.id
         beneficiary.serial_id.beneficiary_id = beneficiary.id
+
         if beneficiary.cemetery_location_id:
             StockMove = self.env["stock.move"]
-            stock_move_list = []
             stock_move_list = self._prepare_stock_move_vals(beneficiary)
             stock_move = StockMove.create(stock_move_list)
             stock_move._action_done()
+
         return beneficiary
 
     def write(self, vals):
@@ -220,3 +186,14 @@ class CemeteryBeneficiary(models.Model):
                 picking.action_assign()
                 stock_move._action_done()
         return result
+
+    def action_open_partner(self):
+        self.ensure_one()
+        action = self.env["ir.actions.actions"]._for_xml_id("base.action_partner_form")
+        action['domain'] = [('id', '=', self.partner_id.id)]
+        action['context'] = {
+            'default_id': self.partner_id.id,  # Set default partner id in the context
+            'form_view_ref': 'base.view_partner_form',  # Reference to the partner form view
+        }
+        return action
+

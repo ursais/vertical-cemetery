@@ -92,7 +92,6 @@ class CemeteryConvert(models.TransientModel):
                 "partner_id": partner.id,
                 "serial_number": partner.id,
                 "beneficiary_type": self.cemetery_type,
-                "death_date": fields.Datetime.today(),
                 "cemetery_location_id": self.cemetery_location_id.id,
             }
         )
