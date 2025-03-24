@@ -11,7 +11,7 @@
                         <group string="Cemetery Details" name="cemetery_details">
                             <field name="is_cemetery_beneficiary"/>
                             <field name="is_cemetery_location"/>
-                            <field name="cemetery_id"/>
+                            <field name="cemetery_id" required="1"/>
                         </group>
                         <group string="Beneficiary Details" name="beneficiary_details" invisible="not is_cemetery_beneficiary">
                             <field name="cemetery_beneficiary_type" required="is_cemetery_beneficiary"/>

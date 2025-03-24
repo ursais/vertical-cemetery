@@ -11,3 +11,5 @@ from . import stock_warehouse
 from . import cemetery_location
 from . import res_config
 from . import stock_move
+from . import cemetery_operation
+from . import cemetery_operation_line

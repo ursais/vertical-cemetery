@@ -19,18 +19,11 @@
 
     <!-- Operations -->
     <menuitem
-        id="menu_cemetery_location_operations"
+        id="menu_cemetery_operations"
         name="Operations"
+        action="cemetery_operation_action"
         parent="cemetery_menu_root"
         sequence="2"
-    />
-
-    <menuitem
-        id="submenu_cemetery_location_operations"
-        name="Locations"
-        action="cemetery_location_operations_action"
-        parent="menu_cemetery_location_operations"
-        sequence="1"
     />
 
     <!-- Master Data -->
@@ -38,7 +31,7 @@
         id="menu_cemetery_master_data"
         name="Master Data"
         parent="cemetery_menu_root"
-        sequence="2"
+        sequence="3"
     />
 
     <menuitem
@@ -50,7 +43,7 @@
     />
 
     <menuitem
-        id="submenu_cemetery_master_data"
+        id="submenu_beneficiaries_master_data"
         name="Beneficiaries"
         action="cemetery_beneficiary_action"
         parent="menu_cemetery_master_data"
@@ -62,7 +55,7 @@
         id="menu_cemetery_reporting"
         name="Reports"
         parent="cemetery_menu_root"
-        sequence="3"
+        sequence="4"
     />
 
     <menuitem

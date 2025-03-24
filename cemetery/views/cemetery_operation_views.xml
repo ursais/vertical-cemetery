@@ -1,0 +1,99 @@
+<odoo>
+
+    <record id="cemetery_operation_form_view" model="ir.ui.view">
+        <field name="name">cemetery.operation.form</field>
+        <field name="model">cemetery.operation</field>
+        <field name="arch" type="xml">
+            <form string="Cemetery Operation">
+                <header>
+                    <button name="action_reserve" string="Reserve Spots" type="object"
+                            class="oe_highlight" invisible="state not in ['draft']"/>
+                    <button name="action_confirm_deceased" string="Confirm Deceased" type="object"
+                            class="oe_highlight" invisible="state not in ['reserved', 'partially_confirmed']"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state not in ['cancelled', 'confirmed']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,reserved,partially_confirmed,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="cemetery_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Beneficiaries">
+                            <field name="operation_line_ids">
+                                <tree decoration-success="state=='confirmed'" decoration-info="state=='reserved'">
+                                    <field name="partner_id" string="Beneficiary"/>
+                                    <field name="beneficiary_type"/>
+                                    <field name="is_confirmed" invisible="1"/>
+                                    <field name="move_id" />
+                                    <field name="cemetery_location_id"
+                                           domain="[('cemetery_id', '=', parent.cemetery_id), ('usage', '!=', 'view')]"/>
+                                    <field name="death_date"
+                                           required="beneficiary_type == 'deceased' and is_confirmed"/>
+                                    <field name="state"/>
+                                    <button name="action_reserve" string="Reserve" type="object" icon="fa-bookmark-o"
+                                            invisible="state != 'draft'"/>
+                                    <button name="action_confirm" string="Confirm" type="object" icon="fa-check"
+                                            invisible="state != 'reserved'"/>
+                                    <button name="action_cancel" string="Cancel" type="object" icon="fa-times"
+                                            invisible="state in ['confirmed', 'cancelled']"/>
+                                </tree>
+                                <form string="Beneficiary">
+                                    <sheet>
+                                        <group>
+                                            <group>
+                                                <field name="partner_id"
+                                                       domain="[('is_cemetery_beneficiary', '=', True)]"
+                                                       context="{'default_is_cemetery_beneficiary':1, 'default_cemetery_beneficiary_type':beneficiary_type}"/>
+                                                <field name="beneficiary_type" required="1"/>
+                                                <field name="cemetery_location_id"
+                                                       domain="[('cemetery_id', '=', parent.cemetery_id), ('usage', '!=', 'view')]"/>
+                                                <field name="death_date" required="beneficiary_type == 'deceased'"
+                                                       invisible="beneficiary_type != 'deceased'"/>
+                                                <field name="is_confirmed" readonly="1"/>
+                                                <field name="state"/>
+                                            </group>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="cemetery_operation_tree_view" model="ir.ui.view">
+        <field name="name">cemetery.operation.tree</field>
+        <field name="model">cemetery.operation</field>
+        <field name="arch" type="xml">
+            <tree string="Cemetery Operations">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="cemetery_id"/>
+                <field name="state" widget="badge" decoration-muted="state == 'draft'" decoration-success="state == 'confirmed'" decoration-info="state== 'reserved'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="cemetery_operation_action" model="ir.actions.act_window">
+        <field name="name">Cemetery Operations</field>
+        <field name="res_model">cemetery.operation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

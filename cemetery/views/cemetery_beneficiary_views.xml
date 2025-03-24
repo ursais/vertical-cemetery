@@ -32,6 +32,7 @@
                             <field name="serial_number"/>
                             <field name="beneficiary_type"/>
                             <field name="occupation_date"/>
+                            <field name="serial_id"/>
                             <field
                                 name="cemetery_location_id"
                                 domain="[('usage', '!=', 'view'), ('is_cemetery_location', '=', True)]"

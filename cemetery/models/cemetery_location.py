@@ -15,6 +15,7 @@ class CemeteryLocation(models.Model):
     )
     partner_id = fields.Many2one("res.partner")
     beneficiary_ids = fields.One2many("cemetery.beneficiary", "cemetery_location_id", readonly=True)
+    is_reserve_location = fields.Boolean()
 
     @api.depends("cemetery_id")
     def _compute_display_name(self):

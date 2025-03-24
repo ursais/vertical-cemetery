@@ -28,11 +28,12 @@ class ResPartner(models.Model):
         partner = super().create(vals)
 
         # Check if the partner is marked as a cemetery beneficiary
-        if vals.get('is_cemetery_beneficiary', False):
+        if vals.get('is_cemetery_beneficiary', False) or self.env.context.get('default_is_cemetery_beneficiary'):
             # Prepare the beneficiary values
+            beneficiary_type = vals.get('cemetery_beneficiary_type') or self.env.context.get('default_cemetery_beneficiary_type') or 'rights_holder'
             beneficiary_vals = {
                 'name': vals.get('name', 'New Beneficiary'),
-                'beneficiary_type': vals.get('cemetery_beneficiary_type'),
+                'beneficiary_type': beneficiary_type,
                 'partner_id': partner.id,  # Assign the correct partner_id
             }
             # Create the cemetery beneficiary

@@ -61,6 +61,7 @@
             <xpath expr="//field[@name='storage_category_id']" position="after">
                 <field name="cemetery_location_type"/>
                 <field name="cemetery_id"/>
+                <field name="is_reserve_location"/>
             </xpath>
 
             <xpath expr="//field[@name='comment']" position="after">
@@ -129,7 +130,9 @@
         <field name="res_model">cemetery.location</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('is_cemetery_location', '=', True)]</field>
-        <field name="context">{'search_default_in_location':1,'default_is_cemetery_location':1,'search_default_warehouse':1}</field>
+        <field name="context">
+            {'search_default_in_location':1,'default_is_cemetery_location':1,'search_default_warehouse':1}
+        </field>
         <field name="search_view_id" ref="cemetery.view_location_search"/>
     </record>
 
@@ -143,29 +146,6 @@
         <field name="view_mode">form</field>
         <field name="view_id" ref="cemetery.view_location_form"/>
         <field name="act_window_id" ref="cemetery.cemetery_location_action"/>
-    </record>
-
-    <!--    -->
-
-    <record id="cemetery_location_operations_action" model="ir.actions.act_window">
-        <field name="name">Locations</field>
-        <field name="res_model">cemetery.location</field>
-        <field name="view_mode">tree,form</field>
-        <field name="domain">[('is_cemetery_location', '=', True)]</field>
-        <field name="context">{'search_default_in_location':1,'default_is_cemetery_location':1}</field>
-        <field name="search_view_id" ref="cemetery.view_location_search"/>
-    </record>
-
-    <record id="cemetery_location_action_tree_operations" model="ir.actions.act_window.view">
-        <field name="view_mode">tree</field>
-        <field name="view_id" ref="stock.view_location_tree2"/>
-        <field name="act_window_id" ref="cemetery.cemetery_location_operations_action"/>
-    </record>
-
-    <record id="cemetery_location_action_form_operations" model="ir.actions.act_window.view">
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="cemetery.view_location_form"/>
-        <field name="act_window_id" ref="cemetery.cemetery_location_operations_action"/>
     </record>
 
 </odoo>

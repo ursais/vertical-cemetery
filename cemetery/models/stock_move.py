@@ -3,9 +3,16 @@
 
 from odoo import fields, models, api
 
+class StockMove(models.Model):
+    _inherit = "stock.move"
+
+    cemetery_operation_line_id = fields.Many2one('cemetery.operation.line')
+
 
 class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
+
+    cemetery_operation_line_id = fields.Many2one('cemetery.operation.line')
 
     @api.model
     def _search(self, domain, offset=0, limit=None, order=None, access_rights_uid=None):

@@ -83,12 +83,6 @@ class CemeteryConvert(models.TransientModel):
         cemetery_beneficiary = CemeteryBeneficiary.create(
             {
                 "name": partner.name,
-                "street": partner.street,
-                "street2": partner.street2,
-                "city": partner.city,
-                "state_id": partner.state_id.id,
-                "zip": partner.zip,
-                "country_id": partner.country_id.id,
                 "partner_id": partner.id,
                 "serial_number": partner.id,
                 "beneficiary_type": self.cemetery_type,
