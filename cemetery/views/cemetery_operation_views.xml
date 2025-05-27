@@ -6,14 +6,8 @@
         <field name="arch" type="xml">
             <form string="Cemetery Operation">
                 <header>
-                    <button name="action_reserve" string="Reserve Spots" type="object"
-                            class="oe_highlight" invisible="state not in ['draft']"/>
-                    <button name="action_confirm_deceased" string="Confirm Deceased" type="object"
-                            class="oe_highlight" invisible="state not in ['reserved', 'partially_confirmed']"/>
-                    <button name="action_cancel" string="Cancel" type="object"
-                            invisible="state not in ['cancelled', 'confirmed']"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="draft,reserved,partially_confirmed,confirmed"/>
+                           statusbar_visible="draft,partially_confirmed,confirmed"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -25,6 +19,7 @@
                         <group>
                             <field name="date"/>
                             <field name="cemetery_id"/>
+                            <field name="cemetery_location_id" domain="[('cemetery_id', '=', cemetery_id), ('usage', '!=', 'view')]"/>
                         </group>
                     </group>
                     <notebook>
@@ -34,31 +29,20 @@
                                     <field name="partner_id" string="Beneficiary"/>
                                     <field name="beneficiary_type"/>
                                     <field name="is_confirmed" invisible="1"/>
-                                    <field name="move_id" />
+<!--                                    <field name="move_id" />-->
                                     <field name="cemetery_location_id"
                                            domain="[('cemetery_id', '=', parent.cemetery_id), ('usage', '!=', 'view')]"/>
-                                    <field name="death_date"
-                                           required="beneficiary_type == 'deceased' and is_confirmed"/>
                                     <field name="state"/>
-                                    <button name="action_reserve" string="Reserve" type="object" icon="fa-bookmark-o"
-                                            invisible="state != 'draft'"/>
-                                    <button name="action_confirm" string="Confirm" type="object" icon="fa-check"
-                                            invisible="state != 'reserved'"/>
-                                    <button name="action_cancel" string="Cancel" type="object" icon="fa-times"
-                                            invisible="state in ['confirmed', 'cancelled']"/>
+                                    <button name="action_confirm" string="Confirm" type="object" icon="fa-check" invisible="state in ['confirmed']"/>
                                 </tree>
                                 <form string="Beneficiary">
                                     <sheet>
                                         <group>
                                             <group>
-                                                <field name="partner_id"
-                                                       domain="[('is_cemetery_beneficiary', '=', True)]"
-                                                       context="{'default_is_cemetery_beneficiary':1, 'default_cemetery_beneficiary_type':beneficiary_type}"/>
+                                                <field name="partner_id" context="{'default_is_cemetery_beneficiary':1}"/>
                                                 <field name="beneficiary_type" required="1"/>
                                                 <field name="cemetery_location_id"
                                                        domain="[('cemetery_id', '=', parent.cemetery_id), ('usage', '!=', 'view')]"/>
-                                                <field name="death_date" required="beneficiary_type == 'deceased'"
-                                                       invisible="beneficiary_type != 'deceased'"/>
                                                 <field name="is_confirmed" readonly="1"/>
                                                 <field name="state"/>
                                             </group>

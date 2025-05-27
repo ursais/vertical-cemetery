@@ -7,7 +7,7 @@ from odoo import models, fields, api
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    is_cemetery_beneficiary = fields.Boolean("Cemetery Beneficiary?")
+    is_cemetery_beneficiary = fields.Boolean("Cemetery Beneficiary?", default=False)
     cemetery_beneficiary_type = fields.Selection(
         selection=[
             ("deceased", "Deceased"),
@@ -28,7 +28,7 @@ class ResPartner(models.Model):
         partner = super().create(vals)
 
         # Check if the partner is marked as a cemetery beneficiary
-        if vals.get('is_cemetery_beneficiary', False) or self.env.context.get('default_is_cemetery_beneficiary'):
+        if vals.get('is_cemetery_beneficiary', True):
             # Prepare the beneficiary values
             beneficiary_type = vals.get('cemetery_beneficiary_type') or self.env.context.get('default_cemetery_beneficiary_type') or 'rights_holder'
             beneficiary_vals = {
@@ -51,5 +51,6 @@ class ResPartner(models.Model):
             domain += [("is_cemetery_location", "=", True)]
         if self._context.get("is_cemetery_partner"):
             domain += [("is_cemetery_beneficiary", "=", True)]
-        return self._search(domain, limit=limit, order=order)
+        res = super()._name_search(name, domain, operator, limit, order)
+        return res
 

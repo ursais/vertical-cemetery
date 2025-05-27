@@ -11,7 +11,7 @@
                         <group string="Cemetery Details" name="cemetery_details">
                             <field name="is_cemetery_beneficiary"/>
                             <field name="is_cemetery_location"/>
-                            <field name="cemetery_id" required="1"/>
+                            <field name="cemetery_id"/>
                         </group>
                         <group string="Beneficiary Details" name="beneficiary_details" invisible="not is_cemetery_beneficiary">
                             <field name="cemetery_beneficiary_type" required="is_cemetery_beneficiary"/>
@@ -27,7 +27,6 @@
         <field name="name">Contacts</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_is_cemetery_beneficiary':1}</field>
     </record>
 
     <record id="cemetery_partner_view_tree_act" model="ir.actions.act_window.view">

@@ -96,6 +96,7 @@ class CemeteryBeneficiary(models.Model):
                 "is_inventory": True,
                 "picked": True,
                 "state": "confirmed",
+                "is_cemetery": True,
                 "picking_id": self._context.get("picking_id")
                               or self.env["stock.picking"],
                 "move_line_ids": [
@@ -131,44 +132,36 @@ class CemeteryBeneficiary(models.Model):
         # Generate a serial number
         beneficiary.serial_number = beneficiary.name
 
-        # Find the reserve location
-        cemetery_stock_location = self.env['cemetery.location'].search([
-            ('is_reserve_location', '=', True),
-            ('cemetery_id', '=', beneficiary.partner_id.cemetery_id.id),
-        ], limit=1)
-
-        if not cemetery_stock_location:
-            raise ValidationError(_("No reserve location found for this cemetery. Please set up a reserve location."))
-
-        # 1. Create the quant first in the reserve location WITHOUT a lot
-        quant = self.env['stock.quant'].create({
-            'location_id': cemetery_stock_location.location_cemetery_id.id,
-            'product_id': cemetery_product.id,
-            'inventory_quantity': 1.0,
-            'quantity': 1.0,  # Initial quantity is 0
-        })
-
-        # Apply the inventory to make it available
-        quant.action_apply_inventory()
-
-        # 2. Now create the lot/serial
+        # 1. Create the lot
         serial_id = self.env["stock.lot"].create({
             "name": beneficiary.serial_number,
-            'location_id': cemetery_stock_location.location_cemetery_id.id,
+            "beneficiary_id": beneficiary.id,
+            'location_id': beneficiary.cemetery_location_id.location_cemetery_id.id,
             "product_id": cemetery_product.id,
+            "is_cemetery_beneficiary": True,
         })
 
-        # 3. Assign the lot to the quant
-        quant.write({
-            'lot_id': serial_id.id
+        main_location = self.env["cemetery.location"].search(
+            [
+                ("is_reserve_location", "=", True),
+                ("parent_id", "=", False),
+                ("location_cemetery_id.usage", "!=", "view"),
+                ("location_cemetery_id.location_id.usage", "=", "view"),
+            ], limit=1,
+        ).location_cemetery_id
+
+        #2 Create the quant
+        quant = self.env['stock.quant'].create({
+            'lot_id': serial_id.id,
+            'location_id': serial_id.location_id.id or main_location.id,
+            'product_id': cemetery_product.id,
+            'inventory_quantity': 1.0,
+            'quantity': 0.0,  # Initial quantity is 0
+            'is_cemetery': True,
         })
 
-        # 4. Compute Location in serial_id
-        serial_id._compute_single_location()
-
-        # 5. Compute product_qty in serial_id
-        serial_id._product_qty()
-
+        #3 Apply the inventory to make it available
+        quant.action_apply_inventory()
 
         # Update the beneficiary with the serial
         beneficiary.serial_id = serial_id.id
@@ -210,12 +203,14 @@ class CemeteryBeneficiary(models.Model):
                         "picking_type_id": self.cemetery_location_id.location_cemetery_id.warehouse_id.int_type_id.id,
                         "location_id": old_cemetery_location_id.id or inventory_loss.id,
                         "location_dest_id": new_location.location_cemetery_id.id,
+                        "is_cemetery": True,
                     }
                 )
                 stock_move_list = self.with_context(
                     source_location=old_cemetery_location_id.id,
                     desti_location_id=new_location.location_cemetery_id.id,
                     picking_id=picking.id,
+                    is_cemetery=True
                 )._prepare_stock_move_vals(self)
                 stock_move = StockMove.create(stock_move_list)
                 picking.action_confirm()

@@ -25,10 +25,11 @@
         "views/res_partner_views.xml",
         "views/stock_location_views.xml",
         "views/stock_lot_views.xml",
+        "views/stock_storage_category_views.xml",
         "wizard/cemetery_convert_views.xml",
         "views/cemetery_menu_views.xml",
     ],
     'post_init_hook': '_activate_stock_settings',
     "installable": True,
-    "Application": True,
+    "application": True,
 }

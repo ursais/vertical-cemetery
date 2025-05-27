@@ -13,7 +13,7 @@ class StockReport(models.Model):
         "cemetery.location", string="Cemetery Location"
     )
     location_id = fields.Many2one("stock.location", string="Location")
-    warehouse_id = fields.Many2one("stock.warehouse",)
+    warehouse_id = fields.Many2one("stock.warehouse")
     partner_id = fields.Many2one("res.partner")
     available_space = fields.Integer()
     occupied_space = fields.Integer()

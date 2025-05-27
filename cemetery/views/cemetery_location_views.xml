@@ -46,11 +46,16 @@
         <field name="mode">primary</field>
         <field name="arch" type="xml">
 
-            <xpath expr="//button[@name='242']" position="attributes">
+            <xpath expr="//field[@name='location_id']" position="after">
+                <label for="parent_id"/>
+                <h2><field name="parent_id" options="{'no_create': True}"/></h2>
+            </xpath>
+
+            <xpath expr="//field[@name='location_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
 
-            <xpath expr="//button[@name='249']" position="attributes">
+            <xpath expr="//div[hasclass('oe_button_box')]" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
 
@@ -58,7 +63,8 @@
                 <field name="is_cemetery_location" groups="cemetery.group_cemetery_user" invisible="1"/>
             </xpath>
 
-            <xpath expr="//field[@name='storage_category_id']" position="after">
+            <xpath expr="//field[@name='storage_category_id']" position="replace">
+                <field name="storage_category_id" invisible="usage != 'internal'" groups="stock.group_stock_storage_categories,cemetery.group_cemetery_user"/>
                 <field name="cemetery_location_type"/>
                 <field name="cemetery_id"/>
                 <field name="is_reserve_location"/>

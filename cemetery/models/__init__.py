@@ -13,3 +13,7 @@ from . import res_config
 from . import stock_move
 from . import cemetery_operation
 from . import cemetery_operation_line
+from . import stock_picking_type
+from . import stock_storage_category
+from . import stock_quant
+from . import stock_picking

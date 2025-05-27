@@ -53,6 +53,7 @@ class Cemetery(models.Model):
         cemeteries = super().create(vals_list)
         StockLocation = self.env["stock.location"]
         CemeteryLocation = self.env["cemetery.location"]
+        PickingType = self.env["stock.picking.type"]
         li = []
         for cemetery in cemeteries:
             locations = StockLocation.search(
@@ -61,9 +62,15 @@ class Cemetery(models.Model):
             for location in locations:
                 location.write({"is_cemetery_location": True})
                 li.append(
-                    {"cemetery_id": cemetery.id, "location_cemetery_id": location.id}
+                    {"cemetery_location_type": "common_ground", "cemetery_id": cemetery.id, "location_cemetery_id": location.id, "is_reserve_location": True}
                 )
+            pickings = PickingType.search(
+                [("warehouse_id", "=", cemetery.warehouse_id.id)]
+            )
+            for picking in pickings:
+                picking.write({"is_cemetery": True})
         CemeteryLocation.create(li)
+        CemeteryLocation.search([("name", "=", "Stock")]).write({"name": "Main"})
         return cemeteries
 
     @api.model

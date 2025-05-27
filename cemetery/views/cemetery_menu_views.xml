@@ -112,7 +112,7 @@
     <menuitem
         id="menu_cemetery_storage_categories_config"
         name="Storage Categories"
-        action="stock.action_storage_category"
+        action="action_storage_category_cemetery"
         parent="menu_cemetery_config_title"
         sequence="3"
         groups="cemetery.group_cemetery_manager"

@@ -9,7 +9,7 @@ class CemeteryLocation(models.Model):
     _description = "Cemetery Location"
 
     cemetery_id = fields.Many2one("cemetery")
-    parent_id = fields.Many2one("cemetery.location")
+    parent_id = fields.Many2one("cemetery.location", string="Parent Location")
     location_cemetery_id = fields.Many2one(
         "stock.location", required=True, ondelete="cascade", delegate=True
     )

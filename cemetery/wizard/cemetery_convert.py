@@ -25,6 +25,7 @@ class CemeteryConvert(models.TransientModel):
     cemetery_location_id = fields.Many2one(
         "cemetery.location", string="Current Location"
     )
+    is_reserve_location = fields.Boolean()
 
     def action_create_cemetery_warehouse(self, partner):
         CemeteryWarehouse = self.env["cemetery"].with_context(active_test=False)
@@ -32,7 +33,7 @@ class CemeteryConvert(models.TransientModel):
             {"name": partner.name, "code": partner.name, "is_cemetery": True,}
         )
 
-    def action_create_cemetery_location(self, partner):
+    def action_create_cemetery_location(self, partner, parent, reserve_location):
         CemeteryLocation = self.env["cemetery.location"].with_context(active_test=False)
         existing_location = CemeteryLocation.search([("partner_id", "=", partner.id)])
         location_id = self.env["stock.location"].search(
@@ -46,7 +47,7 @@ class CemeteryConvert(models.TransientModel):
             [("location_cemetery_id", "=", location_id.id)]
         )
         if existing_location:
-            raise UserError(_("A Cemetery Location exists."))
+            raise UserError(_("This Cemetery Location already exists."))
         location = CemeteryLocation.create(
             {
                 "name": partner.name,
@@ -54,6 +55,8 @@ class CemeteryConvert(models.TransientModel):
                 "is_cemetery_location": True,
                 "cemetery_id": self.cemetery_id.id,
                 "location_id": cemetery_location.id,
+                "parent_id": parent.id,
+                "is_reserve_location": reserve_location,
             }
         )
         partner.write({"is_cemetery_location": True})
@@ -79,21 +82,20 @@ class CemeteryConvert(models.TransientModel):
         cemetery_location = self.env["cemetery.location"].search(
             [("location_cemetery_id", "=", location_id.id)]
         )
-
-        cemetery_beneficiary = CemeteryBeneficiary.create(
+        partner.write(
+            {
+                "is_cemetery_beneficiary": True,
+                "cemetery_beneficiary_type": self.cemetery_type,
+                "cemetery_id": self.cemetery_id.id,
+            }
+        )
+        CemeteryBeneficiary.create(
             {
                 "name": partner.name,
                 "partner_id": partner.id,
                 "serial_number": partner.id,
                 "beneficiary_type": self.cemetery_type,
                 "cemetery_location_id": self.cemetery_location_id.id,
-            }
-        )
-        partner.write(
-            {
-                "is_cemetery_beneficiary": True,
-                "cemetery_beneficiary_type": self.cemetery_type,
-                "cemetery_id": self.cemetery_id.id,
             }
         )
 
@@ -108,6 +110,6 @@ class CemeteryConvert(models.TransientModel):
                 "common_ground",
                 "ossuary",
             ]:
-                self.action_create_cemetery_location(partner)
+                self.action_create_cemetery_location(partner, self.cemetery_location_id, self.is_reserve_location)
             elif self.cemetery_type in ["deceased", "rights_holder"]:
                 self.action_create_cemetery_beneficiary(partner)

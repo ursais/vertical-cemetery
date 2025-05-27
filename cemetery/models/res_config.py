@@ -1,7 +1,7 @@
 from odoo import models, fields
 
 
-class ResCompnay(models.Model):
+class ResCompany(models.Model):
     _inherit = "res.company"
 
     cemetery_product_template = fields.Many2one(
