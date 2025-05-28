@@ -1,6 +1,8 @@
 # Copyright (C) 2025 Open Source Integrators
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import datetime
+
 from odoo import fields, models, api, _
 from odoo.exceptions import ValidationError
 
@@ -23,7 +25,7 @@ class CemeteryBeneficiary(models.Model):
     )
     occupation_date = fields.Datetime(string="Occupation Date")
     cemetery_location_id = fields.Many2one(
-        "cemetery.location", string="Current Location"
+        "cemetery.location", string="Current Location", required=True,
     )
     complete_name = fields.Char()
 
@@ -92,7 +94,7 @@ class CemeteryBeneficiary(models.Model):
                 "name": beneficiary.beneficiary_type,
                 "procure_method": "make_to_stock",
                 "product_uom_qty": 1,
-                "date": beneficiary.occupation_date,
+                "date": datetime.date.today(),
                 "is_inventory": True,
                 "picked": True,
                 "state": "confirmed",
@@ -109,7 +111,7 @@ class CemeteryBeneficiary(models.Model):
                             "product_id": cemetery_product.id,
                             "product_uom_id": cemetery_product.uom_id.id,
                             "company_id": self.env.company.id,
-                            "date": beneficiary.occupation_date,
+                            "date": datetime.date.today(),
                             "lot_id": beneficiary.serial_id.id,
                             "quantity": 1,
                         },
@@ -122,6 +124,7 @@ class CemeteryBeneficiary(models.Model):
     @api.model
     def create(self, vals_list):
         beneficiary = super().create(vals_list)
+        beneficiary.occupation_date = datetime.date.today()
 
         cemetery_product = (
             self.env.company.cemetery_product_template
@@ -143,6 +146,7 @@ class CemeteryBeneficiary(models.Model):
 
         main_location = self.env["cemetery.location"].search(
             [
+                ("cemetery_id", "=", beneficiary.cemetery_location_id.cemetery_id.id),
                 ("is_reserve_location", "=", True),
                 ("parent_id", "=", False),
                 ("location_cemetery_id.usage", "!=", "view"),
@@ -177,7 +181,7 @@ class CemeteryBeneficiary(models.Model):
         return beneficiary
 
     @api.model
-    def write(self, vals):
+    def write(self, vals, context=None):
         old_cemetery_location_id = self.cemetery_location_id.location_cemetery_id
         inventory_loss = self.env["stock.location"].search(
             [
@@ -188,7 +192,7 @@ class CemeteryBeneficiary(models.Model):
             limit=1,
         )
         result = super().write(vals)
-        if self.cemetery_location_id:
+        if self.cemetery_location_id and not context:
             StockMove = self.env["stock.move"]
             if (
                 "cemetery_location_id" in vals
@@ -216,6 +220,8 @@ class CemeteryBeneficiary(models.Model):
                 picking.action_confirm()
                 picking.action_assign()
                 stock_move._action_done()
+        if "cemetery_location_id" in vals:
+            self.occupation_date = datetime.date.today()
         return result
 
     def action_open_partner(self):

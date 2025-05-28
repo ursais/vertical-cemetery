@@ -1,6 +1,8 @@
 # Copyright (C) 2025 Open Source Integrators
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import datetime
+
 from odoo import _, models, fields
 from odoo.exceptions import UserError
 
@@ -82,20 +84,22 @@ class CemeteryConvert(models.TransientModel):
         cemetery_location = self.env["cemetery.location"].search(
             [("location_cemetery_id", "=", location_id.id)]
         )
-        partner.write(
-            {
-                "is_cemetery_beneficiary": True,
-                "cemetery_beneficiary_type": self.cemetery_type,
-                "cemetery_id": self.cemetery_id.id,
-            }
-        )
-        CemeteryBeneficiary.create(
+        beneficiary = CemeteryBeneficiary.create(
             {
                 "name": partner.name,
                 "partner_id": partner.id,
                 "serial_number": partner.id,
                 "beneficiary_type": self.cemetery_type,
                 "cemetery_location_id": self.cemetery_location_id.id,
+                "occupation_date": datetime.date.today(),
+            }
+        )
+        partner.write(
+            {
+                "is_cemetery_beneficiary": True,
+                "cemetery_beneficiary_type": self.cemetery_type,
+                "cemetery_id": self.cemetery_id.id,
+                "beneficiary_id": beneficiary.id,
             }
         )
 

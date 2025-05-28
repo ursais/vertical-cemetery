@@ -7,7 +7,7 @@
             <form string="Cemetery Operation">
                 <header>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="draft,partially_confirmed,confirmed"/>
+                           statusbar_visible="draft,reserved,partially_confirmed,confirmed"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -33,13 +33,14 @@
                                     <field name="cemetery_location_id"
                                            domain="[('cemetery_id', '=', parent.cemetery_id), ('usage', '!=', 'view')]"/>
                                     <field name="state"/>
-                                    <button name="action_confirm" string="Confirm" type="object" icon="fa-check" invisible="state in ['confirmed']"/>
+                                    <button name="action_reserve" string="Reserve" type="object" icon="fa-check" invisible="state in ['reserved', 'confirmed']"/>
+                                    <button name="action_confirm" string="Confirm" type="object" icon="fa-check" invisible="state in ['draft', 'confirmed']"/>
                                 </tree>
                                 <form string="Beneficiary">
                                     <sheet>
                                         <group>
                                             <group>
-                                                <field name="partner_id" context="{'default_is_cemetery_beneficiary':1}"/>
+                                                <field name="partner_id" context="{'default_is_cemetery_beneficiary':1}" domain="[('cemetery_id', '=', parent.cemetery_id)]"/>
                                                 <field name="beneficiary_type" required="1"/>
                                                 <field name="cemetery_location_id"
                                                        domain="[('cemetery_id', '=', parent.cemetery_id), ('usage', '!=', 'view')]"/>

@@ -52,7 +52,7 @@
             <tree string="Beneficiary" create="false">
                 <field name="name" string="Beneficiary"/>
                 <field name="beneficiary_type"/>
-                <field name="complete_name" string="Current Location"/>
+                <field name="cemetery_location_id" string="Current Location"/>
             </tree>
         </field>
     </record>

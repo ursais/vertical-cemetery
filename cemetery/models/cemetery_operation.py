@@ -12,7 +12,7 @@ class CemeteryOperation(models.Model):
 
     name = fields.Char(required=True, copy=False, default=lambda self: _('New'))
     date = fields.Date(default=fields.Date.context_today)
-    state = fields.Selection([('draft', 'Draft'), ('partially_confirmed', 'Partially Confirmed'), ('confirmed', 'Fully Confirmed')], default='draft', tracking=True, store=True)
+    state = fields.Selection([('draft', 'Draft'), ('reserved', 'Reserved'), ('partially_confirmed', 'Partially Confirmed'), ('confirmed', 'Fully Confirmed')], default='draft', tracking=True, store=True)
 
     # Link to stock picking
     # picking_id = fields.Many2one('stock.picking', string='Stock Picking')
