@@ -1,0 +1,157 @@
+<odoo>
+    <!--  Kanban  -->
+    <record id="cemetery_view_kanban" model="ir.ui.view">
+        <field name="name">cemetery.view.kanban</field>
+        <field name="model">cemetery</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_dashboard o_emphasize_colors" create="0" group_create="false">
+                <field name="name"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <!-- Kanban Card Header -->
+                        <div>
+                            <div t-attf-class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <field name="name"/>
+                                    </div>
+                                    <div class="row">
+                                        <div class="o_primary col-6 o_kanban_primary_left">
+                                            <span>Available Space:</span>
+                                            <field name="available_space"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="o_primary col-6 o_kanban_primary_left">
+                                            <span>Occupied Space:</span>
+                                            <field name="occupied_space"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kanban Card Content -->
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!--  Form  -->
+    <record id="view_location_form" model="ir.ui.view">
+        <field name="name">stock.location.form.inherit.cemetery</field>
+        <field name="model">cemetery.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='location_id']" position="after">
+                <label for="parent_id"/>
+                <h2><field name="parent_id" options="{'no_create': True}"/></h2>
+            </xpath>
+
+            <xpath expr="//field[@name='location_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//div[hasclass('oe_button_box')]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='usage']" position="before">
+                <field name="is_cemetery_location" groups="cemetery.group_cemetery_user" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//field[@name='storage_category_id']" position="replace">
+                <field name="storage_category_id" invisible="usage != 'internal'" groups="stock.group_stock_storage_categories,cemetery.group_cemetery_user"/>
+                <field name="cemetery_location_type"/>
+                <field name="cemetery_id"/>
+                <field name="is_reserve_location"/>
+            </xpath>
+
+            <xpath expr="//field[@name='comment']" position="after">
+                <notebook>
+                    <page string="Beneficiaries" name="beneficiaries">
+                        <field name="beneficiary_ids" mode="tree">
+                            <tree editable="bottom">
+                                <field name="name" string="Beneficiary"/>
+                                <field name="beneficiary_type"/>
+                                <field name="cemetery_location_id" readonly="1"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+
+            <xpath expr="//field[@name='scrap_location']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='return_location']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='replenish_location']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='usage']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//group[1]/group[3]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!--  Actions  -->
+
+    <!--  Kanban  -->
+    <record id="cemetery_location_dashboard_action" model="ir.actions.act_window">
+        <field name="name">Cemeteries Overview</field>
+        <field name="res_model">cemetery</field>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="cemetery_view_kanban"/>
+        <field name="context">{'is_cemetery_location_kanban':1}</field>
+    </record>
+
+    <!--  TREE & FORM VIEW -->
+
+    <record id="view_location_search" model="ir.ui.view">
+        <field name="name">stock.location.search.inherit.cemetery</field>
+        <field name="model">cemetery.location</field>
+        <field name="inherit_id" ref="stock.view_location_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='warehouse']" position="attributes">
+                <attribute name="string">Cemetery</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="cemetery_location_action" model="ir.actions.act_window">
+        <field name="name">Locations</field>
+        <field name="res_model">cemetery.location</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_cemetery_location', '=', True)]</field>
+        <field name="context">
+            {'search_default_in_location':1,'default_is_cemetery_location':1,'search_default_warehouse':1}
+        </field>
+        <field name="search_view_id" ref="cemetery.view_location_search"/>
+    </record>
+
+    <record id="cemetery_location_action_tree" model="ir.actions.act_window.view">
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="stock.view_location_tree2"/>
+        <field name="act_window_id" ref="cemetery.cemetery_location_action"/>
+    </record>
+
+    <record id="cemetery_location_action_form" model="ir.actions.act_window.view">
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="cemetery.view_location_form"/>
+        <field name="act_window_id" ref="cemetery.cemetery_location_action"/>
+    </record>
+
+</odoo>

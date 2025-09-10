@@ -1,0 +1,16 @@
+<odoo>
+    <record id="product_template_form_view_inherit_cemetery" model="ir.ui.view">
+        <field name="name">product.template.common.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr = "//div[@name='options']//span[2]" position="after">
+                 <span class="d-inline-flex" groups="cemetery.group_cemetery_user">
+                    <field name="is_cemetery_beneficiary"/>
+                    <label for="is_cemetery_beneficiary"/>
+                </span>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

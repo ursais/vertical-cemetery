@@ -1,0 +1,20 @@
+<odoo>
+    <record model="ir.module.category" id="module_category_cemetery">
+        <field name="name">Cemetery</field>
+        <field name="sequence">4</field>
+    </record>
+
+    <record id="group_cemetery_user" model="res.groups">
+        <field name="name">Cemetery User</field>
+        <field name="implied_ids" eval="[(4, ref('stock.group_stock_user')),(4, ref('stock.group_production_lot')),(4, ref('stock.group_stock_multi_locations'))]"/>
+        <field name="category_id" ref="cemetery.module_category_cemetery" />
+    </record>
+
+    <record id="group_cemetery_manager" model="res.groups">
+        <field name="name">Cemetery Manager</field>
+        <field name="category_id" ref="cemetery.module_category_cemetery" />
+        <field name="implied_ids" eval="[(4, ref('cemetery.group_cemetery_user'))]"/>
+        <field name="users" eval="[(4, ref('base.user_admin'))]" />
+    </record>
+
+</odoo>

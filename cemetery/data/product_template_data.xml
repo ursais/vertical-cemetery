@@ -1,0 +1,8 @@
+<odoo noupdate="1">
+    <record id="cemetery_product_01" model="product.template">
+        <field name="name">Cemetery Beneficiary</field>
+        <field name="is_cemetery_beneficiary">True</field>
+        <field name="detailed_type">product</field>
+        <field name="tracking">serial</field>
+    </record>
+</odoo>

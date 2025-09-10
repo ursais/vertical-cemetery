@@ -1,0 +1,67 @@
+<odoo>
+
+    <!--  Form  -->
+    <record id="cemetery_beneficiary_view_form" model="ir.ui.view">
+        <field name="name">cemetery.beneficiary.form</field>
+        <field name="model">cemetery.beneficiary</field>
+        <field name="arch" type="xml">
+            <form string="Beneficiary">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="action_open_partner" class="oe_stat_button" icon="fa-user">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Contact</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title mb24">
+                        <h1>
+                            <field
+                                id="beneficiary_name"
+                                options="{'line_breaks': False}"
+                                widget="text"
+                                class="text-break"
+                                name="name"
+                                default_focus="1"
+                                placeholder="e.g. Brandom Freeman"
+                            />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="serial_number"/>
+                            <field name="beneficiary_type"/>
+                            <field name="occupation_date"/>
+                            <field name="serial_id"/>
+                            <field
+                                name="cemetery_location_id"
+                                domain="[('usage', '!=', 'view'), ('is_cemetery_location', '=', True)]"
+                            />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--  Tree  -->
+    <record id="cemetery_beneficiary_view_tree" model="ir.ui.view">
+        <field name="name">cemetery.beneficiary.view.tree</field>
+        <field name="model">cemetery.beneficiary</field>
+        <field name="arch" type="xml">
+            <tree string="Beneficiary" create="false">
+                <field name="name" string="Beneficiary"/>
+                <field name="beneficiary_type"/>
+                <field name="cemetery_location_id" string="Current Location"/>
+            </tree>
+        </field>
+    </record>
+
+    <!--  Action  -->
+    <record id="cemetery_beneficiary_action" model="ir.actions.act_window">
+        <field name="name">Beneficiaries</field>
+        <field name="res_model">cemetery.beneficiary</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="cemetery_beneficiary_view_tree"/>
+    </record>
+</odoo>

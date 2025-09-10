@@ -1,0 +1,7 @@
+<odoo>
+
+    <record id="stock.action_location_form" model="ir.actions.act_window">
+        <field name="domain">[('is_cemetery_location', '=', False)]</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,17 @@
+<odoo>
+	<record id="cemetery_stock_move_line_action" model="ir.actions.act_window">
+            <field name="name">Moves History</field>
+            <field name="res_model">stock.move.line</field>
+            <field name="view_mode">tree,kanban,pivot,form</field>
+            <field name="view_id" ref="stock.view_move_line_tree"/>
+            <field name="context">{'search_default_done': 1, 'create': 0, 'pivot_measures': ['quantity_product_uom', '__count__'],'is_cemetery_move':1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_empty_folder">
+                    There's no product move yet
+                </p><p>
+                    This menu gives you the full traceability of inventory operations on a specific product.
+                    You can filter on the product to see all the past movements for the product.
+                </p>
+            </field>
+    </record>
+</odoo>

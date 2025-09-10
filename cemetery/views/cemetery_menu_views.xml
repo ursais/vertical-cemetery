@@ -1,0 +1,120 @@
+<odoo>
+    <!-- Main Menu -->
+    <menuitem
+        id="cemetery_menu_root"
+        name="Cemetery"
+        sequence="5"
+        groups="cemetery.group_cemetery_user"
+    >
+    </menuitem>
+
+    <!-- Dashboard -->
+    <menuitem
+        id="menu_cemetery_location"
+        name="Dashboard"
+        action="cemetery_location_action"
+        parent="cemetery_menu_root"
+        sequence="1"
+    />
+
+    <!-- Operations -->
+    <menuitem
+        id="menu_cemetery_operations"
+        name="Operations"
+        action="cemetery_operation_action"
+        parent="cemetery_menu_root"
+        sequence="2"
+    />
+
+    <!-- Master Data -->
+    <menuitem
+        id="menu_cemetery_master_data"
+        name="Master Data"
+        parent="cemetery_menu_root"
+        sequence="3"
+    />
+
+    <menuitem
+        id="submenu_contacts_master_data"
+        name="Contacts"
+        action="cemetery_partner_action"
+        parent="menu_cemetery_master_data"
+        sequence="1"
+    />
+
+    <menuitem
+        id="submenu_beneficiaries_master_data"
+        name="Beneficiaries"
+        action="cemetery_beneficiary_action"
+        parent="menu_cemetery_master_data"
+        sequence="2"
+    />
+
+    <!-- Reports -->
+    <menuitem
+        id="menu_cemetery_reporting"
+        name="Reports"
+        parent="cemetery_menu_root"
+        sequence="4"
+    />
+
+    <menuitem
+        id="menu_cemetery_move_history_report"
+        name="Move History"
+        action="cemetery_stock_move_line_action"
+        parent="menu_cemetery_reporting"
+        sequence="1"
+    />
+
+    <!-- Configuration -->
+    <menuitem
+        id="menu_cemetery_configuration"
+        name="Configuration"
+        sequence="5"
+        groups="cemetery.group_cemetery_manager"
+        parent="cemetery_menu_root"
+    />
+
+    <menuitem
+        id="menu_cemetery_general_settings"
+        name="Settings"
+        parent="menu_cemetery_configuration"
+        sequence="0"
+        action="action_cemetery_config_settings"
+        groups="cemetery.group_cemetery_manager"
+    />
+
+    <menuitem
+        id="menu_cemetery_config_title"
+        name="Cemetery Management"
+        parent="menu_cemetery_configuration"
+        sequence="1"
+    />
+
+    <menuitem
+        id="menu_cemetery_config"
+        name="Cemeteries"
+        action="cemetery_action"
+        parent="menu_cemetery_config_title"
+        sequence="1"
+        groups="cemetery.group_cemetery_manager"
+    />
+
+    <menuitem
+        id="menu_cemetery_location_config"
+        name="Locations"
+        action="cemetery_location_action"
+        parent="menu_cemetery_config_title"
+        sequence="2"
+        groups="cemetery.group_cemetery_manager"
+    />
+
+    <menuitem
+        id="menu_cemetery_storage_categories_config"
+        name="Storage Categories"
+        action="action_storage_category_cemetery"
+        parent="menu_cemetery_config_title"
+        sequence="3"
+        groups="cemetery.group_cemetery_manager"
+    />
+</odoo>
